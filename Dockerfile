@@ -10,6 +10,8 @@ RUN set -xe; \
     pip \
     python3 \
     python3-venv \
+    python3-mysqldb \
+    libmariadb-dev \
     python3-wheel \
     git \
     supervisor
@@ -75,14 +77,14 @@ ENV LISTEN_PORT 80
 
 ENV PI_SKIP_BOOTSTRAP=false \
     DB_VENDOR=sqlite \
-    PI_VERSION=3.6.3
+    PI_VERSION=3.7
 
 ENV VIRTUAL_ENV=/opt/privacyidea
 RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 RUN pip install wheel && \
-    pip install supervisor uwsgi pymysql-sa PyMySQL pg8000 && \
+    pip install supervisor uwsgi psycopg2-binary mysqlclient pymysql-sa PyMySQL pg8000 && \
     pip install -r https://raw.githubusercontent.com/privacyidea/privacyidea/v${PI_VERSION}/requirements.txt && \
     pip install git+https://github.com/privacyidea/privacyidea.git@v${PI_VERSION}
 

@@ -1,28 +1,39 @@
-version: '2.1'
+version: '3.9'
 
 services:
   mariadb:
-    image: 'docker.io/bitnami/mariadb:10.4'
+    image: 'docker.io/bitnami/mariadb:latest'
     ports:
       - '3306:3306'
     environment:
-      # ALLOW_EMPTY_PASSWORD is recommended only for development.
-      - ALLOW_EMPTY_PASSWORD=yes
-      - MARIADB_DATABASE=privacyidea
-      - MARIADB_USER=privacyidea
-      - MARIADB_PASSWORD=privacyidea
+      - "MARIADB_DATABASE=${DB_NAME}"
+      - "MARIADB_USER=${DB_USER}"
+      - "MARIADB_PASSWORD=${DB_PASSWORD}"
+      - "MARIADB_ROOT_PASSWORD=${DB_ROOT_PASSWORD}"
+    healthcheck:
+        test: mysqladmin -p${DB_ROOT_PASSWORD} ping -h localhost
+        timeout: 5s
+        retries: 5
+ 
   privacyidea:
-    image: 'docker.io/khalibre/privacyidea:latest'
+    build: .
     ports:
-      - '80:80'
+      - '8085:80'
     environment:
       - DB_VENDOR=mariadb
-      - DB_NAME=privacyidea
       - DB_HOST=mariadb
-      - DB_USER=privacyidea
-      - DB_PASSWORD=privacyidea
-      - SECRET_KEY=suppersecretkey
-      - PI_PEPPER=secretworduseforadminencrypt
-      - PI_PAGE_TITLE=pivacyIDEA
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - SECRET_KEY=${SECRET_KEY}
+      - PI_PEPPER=${PI_PEPPER}
+      - PI_PAGE_TITLE=${PI_PAGE_TITLE}
+      - PI_EXTERNAL_LINKS=True
+      - PI_LOGFILE=${PI_LOGFILE}
+      - PI_ADMIN_USER=${PI_ADMIN_USER}
+      - PI_ADMIN_PASSWORD=${PI_ADMIN_PASSWORD}
+    volumes:
+      - ./certs:/etc/privacyidea/certs
     depends_on:
-      - mariadb
+       mariadb:
+          condition: service_healthy

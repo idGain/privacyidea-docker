@@ -1,3 +1,5 @@
 *.swp
 secretkey
 pipepper
+.env
+

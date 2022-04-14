@@ -10,7 +10,7 @@ if { [ "${DB_VENDOR}" = "mariadb" ] || [ "${DB_VENDOR}" = "mysql" ]; } then
 elif { [ "${DB_VENDOR}" = "postgresql" ]; } then
     export SQLALCHEMY_DATABASE_URI=postgresql+pg8000://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}
 else
-    echo "DB_VENDOR enviroment varaible is not set. Using default SQLite..."
+    echo "DB_VENDOR environment variable is not set. Using default SQLite..."
 fi
 if [ "${PI_SKIP_BOOTSTRAP}" = false ]; then
     if [ ! -f /etc/privacyidea/encfile ]; then
