@@ -24,6 +24,10 @@ RUN mkdir -p mkdir /etc/privacyidea/data/keys \
 
 #    apt-get remove --purge --auto-remove -y ca-certificates && rm -rf /var/lib/apt/lists/*
 
+# Add 'wait-for-it'
+COPY wait-for-it.sh /usr/local/bin/wait-for-it
+RUN chmod +x /usr/local/bin/wait-for-it
+
 # COPY PI configuration
 COPY ./configs/config.py /etc/privacyidea/pi.cfg
 
@@ -93,7 +97,7 @@ RUN pip install wheel && \
 # Make sure scripts can be executed and do some cleanup
 
 EXPOSE 80/tcp
-EXPOSE 443/tcp
+#EXPOSE 443/tcp
 
 #USER privacyidea 
 ENTRYPOINT ["/entrypoint.sh"]

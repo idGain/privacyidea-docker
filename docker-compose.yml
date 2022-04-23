@@ -1,24 +1,34 @@
-version: '3.9'
+version: "3.7"
+
+networks:
+  web:
+    external: true
+  internal:
+    external: false
 
 services:
   mariadb:
     image: 'docker.io/bitnami/mariadb:latest'
-    ports:
-      - '3306:3306'
+    container_name: mariadb
+    hostname: mariadb
     environment:
       - "MARIADB_DATABASE=${DB_NAME}"
       - "MARIADB_USER=${DB_USER}"
       - "MARIADB_PASSWORD=${DB_PASSWORD}"
       - "MARIADB_ROOT_PASSWORD=${DB_ROOT_PASSWORD}"
-    healthcheck:
-        test: mysqladmin -p${DB_ROOT_PASSWORD} ping -h localhost
-        timeout: 5s
-        retries: 5
+    networks:
+      - internal
+    volumes:
+    - mariadb-data:/var/lib/mysql
+#    healthcheck:
+#        test: mysqladmin -p${DB_ROOT_PASSWORD} ping -h localhost
+#        timeout: 5s
+#        retries: 5
  
   privacyidea:
     build: .
-    ports:
-      - '8085:80'
+    container_name: mfa
+    hostname: mfa
     environment:
       - DB_VENDOR=mariadb
       - DB_HOST=mariadb
@@ -32,8 +42,20 @@ services:
       - PI_LOGFILE=${PI_LOGFILE}
       - PI_ADMIN_USER=${PI_ADMIN_USER}
       - PI_ADMIN_PASSWORD=${PI_ADMIN_PASSWORD}
+    labels:
+      - traefik.http.routers.mfa.rule=Host(`mfa.kion.com.tr`)
+      - traefik.http.routers.mfa.tls=true
+      - traefik.http.routers.mfa.tls.certresolver=lets-encrypt
+      - traefik.port=80
     volumes:
-      - ./certs:/etc/privacyidea/certs
+      - ./data:/etc/privacyidea/
+    networks:
+      - internal
+      - web
     depends_on:
-       mariadb:
-          condition: service_healthy
+      - mariadb
+#          condition: service_completed_successfully
+    command: wait-for-it mariadb:3306 -- /start.sh
+
+volumes:
+  mariadb-data:
