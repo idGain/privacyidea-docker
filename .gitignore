@@ -1,5 +1,6 @@
 *.swp
 secretkey
 pipepper
+structure-tests-report.xml
 .env
-
+.DS_Store
