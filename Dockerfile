@@ -1,4 +1,4 @@
-FROM python:3.8.13-bullseye
+FROM python:3.8.16-bullseye
 
 LABEL maintainer="Sida Say <sida.say@khalibre.com>"
 
@@ -65,7 +65,7 @@ RUN python3 -m venv $VIRTUAL_ENV
 
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
-ARG PI_VERSION=3.7.1
+ARG PI_VERSION=3.8.1
 
 RUN pip3 install wheel && \
     pip3 install uwsgi pymysql-sa PyMySQL psycopg2-binary && \
